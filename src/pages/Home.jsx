@@ -2,16 +2,21 @@ import React, { useEffect, useState } from "react";
 import { BASE_URL } from "../Common";
 import axios from "axios";
 import Loading from "../components/loading/Loading";
+import EditTodo from "../components/loading/editTodo/EditTodo";
 
 function Home() {
   const [todos, setTodos] = useState([]);
   const [addTask, setAddTask] = useState("");
+  const [open, setOpen] = useState(false);
+  const [editId, setEditId] = useState("");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     getTodos();
-  }, []);
+  }, [open]);
 
   const getTodos = async () => {
+    setLoading(true);
     try {
       let config = {
         method: "get",
@@ -20,6 +25,7 @@ function Home() {
       const response = await axios(config);
       if (response?.status === 201) {
         setTodos(response?.data?.todos);
+        setLoading(false);
         return;
       }
     } catch (err) {
@@ -41,6 +47,7 @@ function Home() {
       if (addTask === "") {
         return alert("Please Type Something");
       }
+      setLoading(true);
       let config = {
         method: "post",
         url: `${BASE_URL}/todos`,
@@ -52,6 +59,7 @@ function Home() {
 
       if (response?.status === 201) {
         setTodos((prevTodos) => [...prevTodos, response?.data?.newTodo]);
+        setLoading(false);
         return;
       }
     } catch (err) {
@@ -59,12 +67,33 @@ function Home() {
     }
   };
 
+  const handleClick = (id) => {
+    setEditId(id);
+    setOpen(true);
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      setLoading(true);
+      let config = {
+        method: "delete",
+        url: `${BASE_URL}/todos/${id}`,
+      };
+
+      const response = await axios(config);
+      if (response?.status === 201) {
+        const newTodo = todos?.filter((item) => item?._id !== id);
+        setTodos(newTodo);
+        setLoading(false);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   const handleInputChange = (e) => {
     setAddTask(e.target.value);
   };
-
-
-
 
   return (
     <div className="bg-[#d6cfcf] pt-5 text-[#000] min-h-[100vh]">
@@ -74,41 +103,63 @@ function Home() {
           TODO LIST
         </p>
 
-        {todos?.length > 0 ? (
-          <>
-            <form className="mt-5" onSubmit={handleSubmit}>
-              <input
-                className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none"
-                type="text"
-                value={addTask}
-                onChange={(e) => handleInputChange(e)}
-                placeholder="Add Task"
-              />
+        <>
+          <form className="mt-5" onSubmit={handleSubmit}>
+            <input
+              className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none"
+              type="text"
+              value={addTask}
+              onChange={(e) => handleInputChange(e)}
+              placeholder="Add Task"
+            />
 
-              <div className="text-center">
-                <button className="px-5 py-2 rounded-xl font-[600] text-[#fff] bg-[blue]">
-                  {" "}
-                  Add Task{" "}
-                </button>
-              </div>
-            </form>
+            <div className="text-center">
+              <button className="px-5 py-2 rounded-xl font-[600] text-[#fff] bg-[blue]">
+                {" "}
+                {loading ? (
+               
+                    <Loading />
+                
+                ) : (
+                  "Add Task"
+                )}
+              </button>
+            </div>
+          </form>
+          {todos?.length > 0 && (
+            <>
+              {todos?.map((item) => (
+                <div className="py-2 bg-gray-200 mt-10 text-gray-700 justify-between items-center flex">
+                  <div className="text-[16px]  px-4 ">{item?.todo}</div>
+                  <div className="items-center gap-5 flex pr-2 text-[#fff] text-[16px]">
+                    <button
+                      onClick={() => handleClick(item?._id)}
+                      className=" bg-[#4848cf] py-2  px-4 shadow-lg rounded-lg"
+                    >
+                      Edit
+                    </button>
 
-            {todos?.map((item) => (
-              <div className="py-2 bg-gray-200 mt-10 text-gray-700 justify-between items-center flex">
-                <div className="text-[16px]  px-4 ">{item?.todo}</div>
-                <div className="items-center gap-5 flex pr-2 text-[#fff] text-[16px]">
-                  <button className=" bg-[#4848cf] py-2  px-4 shadow-lg rounded-lg">
-                    Edit
-                  </button>
-                  <button className=" bg-[#cb2828] py-2  px-4 shadow-lg rounded-lg">
-                    Delete
-                  </button>
+                    <button
+                      onClick={() => handleDelete(item?._id)}
+                      className=" bg-[#cb2828] py-2  px-4 shadow-lg rounded-lg"
+                    >
+                      {loading ? "Loading" : "Delete"}
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </>
-        ) : (
-          <Loading />
+              ))}
+            </>
+          )}
+        </>
+
+        {open && editId && (
+          <EditTodo
+            id={editId}
+            setOpen={setOpen}
+            setLoading={setLoading}
+            loading={loading}
+            setTodos={setTodos}
+          />
         )}
       </div>
     </div>
