@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { BASE_URL } from "../../../Common";
+import { BASE_URL } from "../../Common";
 import axios from "axios";
-import Loading from "../Loading";
+import Loading from "../loading/Loading";
 
 function EditTodo({ id, setOpen, setTodos, setLoading, loading }) {
   const [todoById, setTodoById] = useState();
@@ -67,10 +67,10 @@ function EditTodo({ id, setOpen, setTodos, setLoading, loading }) {
   };
 
   return (
-    <div className="fixed top-[15%] left-0 right-0  lg:w-[60%] w-[75%] bg-[#fff] px-3 shadow-xl mx-auto pb-5 ">
+    <div className="fixed top-[30%] left-0 right-0  lg:w-[60%] w-[75%] bg-[#fff] px-3 shadow-xl mx-auto pb-5 ">
       <p className="text-center text-[14px]   pt-4 uppercase font-[600] ">
         {" "}
-        Edit Todo
+        {todoById && "Edit Todo"}
       </p>
       {todoById ? (
         <>

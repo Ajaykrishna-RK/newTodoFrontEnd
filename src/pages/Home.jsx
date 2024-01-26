@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { BASE_URL } from "../Common";
 import axios from "axios";
 import Loading from "../components/loading/Loading";
-import EditTodo from "../components/loading/editTodo/EditTodo";
+import EditTodo from "../components/editTodo/EditTodo";
 
 function Home() {
   const [todos, setTodos] = useState([]);
@@ -10,6 +10,8 @@ function Home() {
   const [open, setOpen] = useState(false);
   const [editId, setEditId] = useState("");
   const [loading, setLoading] = useState(false);
+  const [iid, setIid] = useState("");
+  const [text, setText] = useState("Add Task");
 
   useEffect(() => {
     getTodos();
@@ -47,7 +49,7 @@ function Home() {
       if (addTask === "") {
         return alert("Please Type Something");
       }
-      setLoading(true);
+      setText(<Loading />);
       let config = {
         method: "post",
         url: `${BASE_URL}/todos`,
@@ -59,7 +61,7 @@ function Home() {
 
       if (response?.status === 201) {
         setTodos((prevTodos) => [...prevTodos, response?.data?.newTodo]);
-        setLoading(false);
+        setText("Add Task");
         return;
       }
     } catch (err) {
@@ -73,6 +75,7 @@ function Home() {
   };
 
   const handleDelete = async (id) => {
+    setIid(id);
     try {
       setLoading(true);
       let config = {
@@ -116,20 +119,17 @@ function Home() {
             <div className="text-center">
               <button className="px-5 py-2 rounded-xl font-[600] text-[#fff] bg-[blue]">
                 {" "}
-                {loading ? (
-               
-                    <Loading />
-                
-                ) : (
-                  "Add Task"
-                )}
+                {text}
               </button>
             </div>
           </form>
           {todos?.length > 0 && (
             <>
               {todos?.map((item) => (
-                <div className="py-2 bg-gray-200 mt-10 text-gray-700 justify-between items-center flex">
+                <div
+                  key={item?.id}
+                  className="py-2 bg-gray-200 mt-10 text-gray-700 justify-between items-center flex"
+                >
                   <div className="text-[16px]  px-4 ">{item?.todo}</div>
                   <div className="items-center gap-5 flex pr-2 text-[#fff] text-[16px]">
                     <button
@@ -143,7 +143,7 @@ function Home() {
                       onClick={() => handleDelete(item?._id)}
                       className=" bg-[#cb2828] py-2  px-4 shadow-lg rounded-lg"
                     >
-                      {loading ? "Loading" : "Delete"}
+                      {iid === item?._id && loading ? <Loading /> : "Delete"}
                     </button>
                   </div>
                 </div>
