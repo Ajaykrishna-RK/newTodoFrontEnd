@@ -62,6 +62,7 @@ function Home() {
       if (response?.status === 201) {
         setTodos((prevTodos) => [...prevTodos, response?.data?.newTodo]);
         setText("Add Task");
+        setAddTask("");
         return;
       }
     } catch (err) {
@@ -123,15 +124,15 @@ function Home() {
               </button>
             </div>
           </form>
-          {todos?.length > 0 && (
+          {todos?.length > 0 ? (
             <>
               {todos?.map((item) => (
                 <div
                   key={item?.id}
-                  className="py-2 bg-gray-200 mt-10 text-gray-700 justify-between items-center flex"
+                  className="py-2 w-full bg-gray-200 mt-10 text-gray-700 justify-center items-center lg:flex grid"
                 >
                   <div className="text-[16px]  px-4 ">{item?.todo}</div>
-                  <div className="items-center gap-5 flex pr-2 text-[#fff] text-[16px]">
+                  <div className="mt-4 items-center w-full justify-center gap-5 flex  text-[#fff] text-[16px]">
                     <button
                       onClick={() => handleClick(item?._id)}
                       className=" bg-[#4848cf] py-2  px-4 shadow-lg rounded-lg"
@@ -149,6 +150,10 @@ function Home() {
                 </div>
               ))}
             </>
+          ) : (
+            <div className="text-[20px] justify-center mt-10 items-center flex  ">
+              <p>No Tasks Added</p>
+            </div>
           )}
         </>
 
