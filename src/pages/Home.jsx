@@ -129,10 +129,12 @@ function Home() {
               {todos?.map((item) => (
                 <div
                   key={item?.id}
-                  className="py-2 w-full bg-gray-200 mt-10 text-gray-700 justify-center items-center lg:flex grid"
+                  className="py-2 w-full flex-shrink-0 bg-gray-200 mt-10 text-gray-700 justify-center items-start lg:flex grid"
                 >
-                  <div className="text-[16px]  px-4 ">{item?.todo}</div>
-                  <div className="mt-4 items-center w-full justify-center gap-5 flex  text-[#fff] text-[16px]">
+                  <div className="text-[16px] w-full text-center  px-4 ">
+                    {item?.todo}
+                  </div>
+                  <div className="lg:mt-0 mt-4 lg:pr-4 items-start w-full justify-center lg:justify-end gap-5 flex  text-[#fff] text-[16px]">
                     <button
                       onClick={() => handleClick(item?._id)}
                       className=" bg-[#4848cf] py-2  px-4 shadow-lg rounded-lg"
